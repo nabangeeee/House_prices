@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+
 train = pd.read_csv('train.csv')
 
 test = pd.read_csv('test.csv')
@@ -61,14 +62,12 @@ train = train[train['TotalBsmtSF']<3200]
 
 
 
-
-
 ## 2-3. 상관관계 분석 (히트맵)
 
 # 상관계수
 numerical_columns = train.select_dtypes(include=['number'])  # 숫자 열만 선택
 corr = numerical_columns.corr()
-corr_columns = corr.index[abs(corr["SalePrice"]) >= 0.4]  # 상관계수 0.4 이상만 포함
+corr_columns = corr.index[abs(corr['SalePrice']) >= 0.4]  # 상관계수 0.4 이상만 포함
 print(corr_columns)
 
 # 히트맵
@@ -77,8 +76,19 @@ heatmap = sns.heatmap(train[corr_columns].corr(), annot=True, cmap="coolwarm")
 # plt.show()
 
 
+
 ## 2-3. 데이터 합치기 (concat)
-df_train = train.drop(['SalePrice']) #test데이터에 없는 예측해야될 값인 'SalePrice'컬럼을 train데이터에서 지워줌
-df = pd.concat((df_train,test)) #데이터 합치기
+df_train = train.drop(['SalePrice'], axis=1) #test데이터에 없는 예측해야될 값인 'SalePrice'컬럼을 train데이터에서 지워줌
+df = pd.concat((df_train, test)) #데이터 합치기
+
+## 2-4. 타겟변수 쏠림 현상 파악
+sns.displot(train['SalePrice']) #그래프의 왼쪽으로의 쏠림현상 확인
+# plt.show()
+
+train['SalePrice'] = np.log1p(train["SalePrice"]) #로그 변환을 통해 정규성을 띄도록 바꿔줌
+sns.displot(train['SalePrice']) #정규화 된 것을 확인
+# plt.show()
+price = train['SalePrice'] #변수에 할당
+
 
 
